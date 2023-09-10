@@ -8,7 +8,6 @@ unsigned short _tick = 0;
 
 #define save_context()          \
 	{                           \
-		curSP = SP;             \
 		__asm__("push ACC\n\t	 \
 				push DPL\n\t     \
 				push DPH\n\t\
@@ -22,6 +21,7 @@ unsigned short _tick = 0;
 				push ar0\n\t\
 				push ar1\n\t\
 				push PSW\n\t"); \
+		curSP = SP;             \
 	}
 
 #define restore_context() \
@@ -40,7 +40,7 @@ unsigned short _tick = 0;
 			pop DPH\n\t\
 			pop DPL\n\t\
 			pop ACC\n\t\
-			reti\n\t");    \
+			reti\n\t");   \
 	}
 
 struct task_s
@@ -161,19 +161,26 @@ void delay_ms(unsigned short ms)
 
 void task1_func(void)
 {
+	int a = 0;
+	P1 = 0xff;
+	P3_4 = 0;
+	P3_3 = 1;
 	while (1)
 	{
-		P1_1 = !P1_1;
-		delay_tick(100);
+		P1 = ~P1;
+		P3_4 = !P3_4;
+		P3_3 = !P3_3;
+		delay_tick(10);
 	}
 }
 
 void task2_func(void)
 {
+	uart_init();
 	while (1)
 	{
-		P2_1 = !P2_1;
-		delay_tick(200);
+		uart_put_string("Hello, toi la duong day!\n");
+		delay_tick(20);
 	}
 }
 
@@ -189,37 +196,37 @@ void timer0_start(void)
 	TR0 = 1;
 }
 
-// void uart_init(void)
-// {
-// 	SCON = 0x50;
-// 	TMOD += 0X20;
-// 	TH1 = 0xE8;
-// 	TH0 = 0xE8;
-// 	TR1 = 1;
-// }
+void uart_init(void)
+{
+	SCON = 0x50;
+	TMOD += 0X20;
+	TH1 = 0xE8;
+	TH0 = 0xE8;
+	TR1 = 1;
+}
 
-// void uart_put_char(char c)
-// {
-// 	SBUF = c;
-// 	while (TI == 0)
-// 		;
-// 	TI = 0;
-// }
+void uart_put_char(char c)
+{
+	SBUF = c;
+	while (TI == 0)
+		;
+	TI = 0;
+}
 
-// char uart_is_rx_ready(void)
-// {
-// 	return RI;
-// }
+char uart_is_rx_ready(void)
+{
+	return RI;
+}
 
-// char uart_read_char(void)
-// {
-// 	RI = 0;
-// 	return SBUF;
-// }
+char uart_read_char(void)
+{
+	RI = 0;
+	return SBUF;
+}
 
-// void uart_put_string(const char *str)
-// {
-// 	unsigned char i = 0;
-// 	while (*str)
-// 		uart_put_char(*str++);
-// }
+void uart_put_string(const char *str)
+{
+	unsigned char i = 0;
+	while (*str)
+		uart_put_char(*str++);
+}
