@@ -1,0 +1,50 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "/home/duong/learn/8051/code-c/**",
+                "/usr/share/sdcc/include/mcs51"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "c17",
+            "cppStandard": "gnu++17",
+            "intelliSenseMode": "linux-gcc-x64",
+            "configurationProvider": "ms-vscode.makefile-tools",
+            "compilerPathInCppPropertiesJson": "/usr/bin/gcc",
+            "configurationProviderInCppPropertiesJson": "ms-vscode.makefile-tools",
+            "mergeConfigurations": false,
+            "browse": {
+                "path": [
+                    "/home/duong/learn/8051/code-c/**",
+                    "/usr/share/sdcc/include/**",
+                    "${workspaceFolder}"
+                ],
+                "limitSymbolsToIncludedHeaders": true
+            }
+        },
+        {
+            "name": "sdcc",
+            "includePath": [
+                "/home/duong/learn/8051/code-c/**",
+                "/usr/share/sdcc/include/**"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/sdcc",
+            "cStandard": "c17",
+            "cppStandard": "gnu++17",
+            "intelliSenseMode": "${default}",
+            "compilerPathInCppPropertiesJson": "/usr/bin/gcc",
+            "mergeConfigurations": false,
+            "browse": {
+                "path": [
+                    "/home/duong/learn/8051/code-c/**",
+                    "${workspaceFolder}"
+                ],
+                "limitSymbolsToIncludedHeaders": true
+            }
+        }
+    ],
+    "version": 4
+}

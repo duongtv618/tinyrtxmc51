@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "8051.h": "c",
+        "at89x51.h": "c",
+        "type_traits": "c"
+    },
+    "C_Cpp.errorSquiggles": "disabled"
+}
