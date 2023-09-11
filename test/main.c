@@ -16,40 +16,6 @@ void main()
 	return;
 }
 
-/** help function*/
-void print_int8_t(int8_t c)
-{
-	char buf[5];
-	char i;
-	char negative = 0;
-	int8_t temp;
-
-	i = 0;
-	temp = c;
-	buf[i++] = 0;
-
-	if (c < 0)
-	{
-		negative = 1;
-		c = -c;
-	}
-
-	do
-	{
-		temp = c % 10;
-		buf[i++] = temp + '0';
-	} while ((c /= 10) > 0);
-
-	if (negative)
-		buf[i++] = '-';
-
-	// reverse;
-	while (buf[--i])
-	{
-		uart_put_char(buf[i]);
-	}
-}
-
 void task_uart(void)
 {
 	uart_init();
