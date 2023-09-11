@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include "8051.h"
 
-#define STACK_START 0x20
+#define STACK_START 0x28
 #define STACK_TOP_STACK 0X7F
 #define MAX_TASK 3
 #define TIMER0_INT_ENABLE (ET0 = 1)
