@@ -4,11 +4,12 @@
         "at89x51.h": "c",
         "type_traits": "c",
         "stdint.h": "c",
-<<<<<<< Updated upstream
-        "compare": "c"
-=======
-        "rtx51.h": "c"
->>>>>>> Stashed changes
     },
-    "C_Cpp.errorSquiggles": "enabled"
+    "C_Cpp.errorSquiggles": "enabled",
+    "editor.rulers": [
+
+    ],
+    "workbench.colorCustomizations": {
+        "editorRuler.foreground": "#ff4081"
+    }
 }

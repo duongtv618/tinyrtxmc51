@@ -14,5 +14,6 @@
 void os_delay_tick(unsigned short);
 void os_create_task(void (*func)(void), uint8_t size);
 void os_start_scheduler(void);
+void os_yeild(void);
 void Timer0_ISR(void) __interrupt TF0_VECTOR __naked;
 #endif

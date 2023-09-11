@@ -6,54 +6,52 @@
 #define MAX_TASK 3
 #define TIMER0_INT_ENABLE (ET0 = 1)
 
-#define save_context()          \
+#define save_context()           \
+    {                            \
+        __asm__("push ACC\n\t"); \
+        __asm__("push DPL\n\t"); \
+        __asm__("push DPH\n\t"); \
+        __asm__("push b\n\t");   \
+        __asm__("push ar2\n\t"); \
+        __asm__("push ar3\n\t"); \
+        __asm__("push ar4\n\t"); \
+        __asm__("push ar5\n\t"); \
+        __asm__("push ar6\n\t"); \
+        __asm__("push ar7\n\t"); \
+        __asm__("push ar0\n\t"); \
+        __asm__("push ar1\n\t"); \
+        __asm__("push PSW\n\t"); \
+        current_SP = SP;         \
+    }
+
+#define restore_context()       \
     {                           \
-        __asm__("push ACC\n\t	 \
-				push DPL\n\t     \
-				push DPH\n\t\
-				push b\n\t\
-				push ar2\n\t\
-				push ar3\n\t\
-				push ar4\n\t\
-				push ar5\n\t\
-				push ar6\n\t\
-				push ar7\n\t\
-				push ar0\n\t\
-				push ar1\n\t\
-				push PSW\n\t"); \
-        current_SP = SP;        \
+        SP = current_SP;        \
+        __asm__("pop PSW\n\t"); \
+        __asm__("pop ar1\n\t"); \
+        __asm__("pop ar0\n\t"); \
+        __asm__("pop ar7\n\t"); \
+        __asm__("pop ar6\n\t"); \
+        __asm__("pop ar5\n\t"); \
+        __asm__("pop ar4\n\t"); \
+        __asm__("pop ar3\n\t"); \
+        __asm__("pop ar2\n\t"); \
+        __asm__("pop b\n\t");   \
+        __asm__("pop DPH\n\t"); \
+        __asm__("pop DPL\n\t"); \
+        __asm__("pop ACC\n\t"); \
+        __asm__("reti\n\t");    \
     }
 
-#define restore_context() \
-    {                     \
-        SP = current_SP;  \
-        __asm__("pop PSW\n\t\
-			pop ar1\n\t\
-			pop ar0\n\t\
-			pop ar7\n\t\
-			pop ar6\n\t\
-			pop ar5\n\t\
-			pop ar4\n\t\
-			pop ar3\n\t\
-			pop ar2\n\t\
-			pop b\n\t\
-			pop DPH\n\t\
-			pop DPL\n\t\
-			pop ACC\n\t\
-			reti\n\t");   \
-    }
-
-static struct task_s
-{
-    uint8_t sp;
-    uint8_t state;
-} task[MAX_TASK];
 
 static uint8_t current_SP = STACK_START;
 static uint16_t _tick = 0;
 static uint8_t taskcnt = 0;
 static uint8_t tasknum = 0;
 
+static uint8_t tasksp[MAX_TASK] = {0, 0, 0};
+
+// static void save_context(void) __naked;
 static void timer0_init(void);
 static void timer0_start(void);
 static void idle_task(void);
@@ -71,6 +69,43 @@ static void timer0_start(void)
     TR0 = 1;
 }
 
+// static void save_context(void) __naked
+// {
+//     __asm__("push ACC\n\t");
+//     __asm__("push DPL\n\t");
+//     __asm__("push DPH\n\t");
+//     __asm__("push b\n\t");
+//     __asm__("push ar2\n\t");
+//     __asm__("push ar3\n\t");
+//     __asm__("push ar4\n\t");
+//     __asm__("push ar5\n\t");
+//     __asm__("push ar6\n\t");
+//     __asm__("push ar7\n\t");
+//     __asm__("push ar0\n\t");
+//     __asm__("push ar1\n\t");
+//     __asm__("push PSW\n\t");
+//     current_SP = SP;
+// }
+
+// static void restore_context(void) __naked
+// {
+//     SP = current_SP;
+//     __asm__("pop PSW\n\t");
+//     __asm__("pop ar1\n\t");
+//     __asm__("pop ar0\n\t");
+//     __asm__("pop ar7\n\t");
+//     __asm__("pop ar6\n\t");
+//     __asm__("pop ar5\n\t");
+//     __asm__("pop ar4\n\t");
+//     __asm__("pop ar3\n\t");
+//     __asm__("pop ar2\n\t");
+//     __asm__("pop b\n\t");
+//     __asm__("pop DPH\n\t");
+//     __asm__("pop DPL\n\t");
+//     __asm__("pop ACC\n\t");
+//     __asm__("reti\n\t");
+// }
+
 void Timer0_ISR(void) __interrupt TF0_VECTOR __naked
 {
     TF0 = 0;
@@ -83,15 +118,25 @@ void Timer0_ISR(void) __interrupt TF0_VECTOR __naked
     restore_context();
 }
 
+void os_yeild(void)
+{
+    /** Set timer value to -3 so that it need 3 machine cycle
+     * ignore to use tf0 set to 1 cause it can cause unexpected
+     * behavior
+    */
+    TH0 = 0xFF;
+    TL0 = 0xFC;
+}
+
 static void switch_to(void)
 {
-    task[taskcnt].sp = current_SP;
+    tasksp[taskcnt] = current_SP;
 
     // find the next task to run, return in taskcnt
     if (++taskcnt >= tasknum)
         taskcnt = 0;
 
-    current_SP = task[taskcnt].sp;
+    current_SP = tasksp[taskcnt];
 }
 
 void os_create_task(void (*func)(void), uint8_t size)
@@ -101,7 +146,6 @@ void os_create_task(void (*func)(void), uint8_t size)
     __data uint8_t __at(0x7f) h = (uint8_t)(func);
     __data uint8_t __at(0x7e) l = (uint8_t)((uint16_t)func >> 8);
 
-    
     __data uint8_t __at(0x7d) sp = cstackptr;
 
     __asm__("\
@@ -114,8 +158,7 @@ void os_create_task(void (*func)(void), uint8_t size)
 	");
 
     current_SP = cstackptr + 14;
-    task[taskcnt++].sp = current_SP;
-    tasknum++;
+    tasksp[tasknum++] = current_SP;
     cstackptr += size;
 }
 
@@ -128,6 +171,11 @@ void os_start_scheduler(void)
     TIMER0_INT_ENABLE;
     timer0_init();
     timer0_start();
+
+    //task [0] will be the first task to go
+    if (taskcnt >= tasknum)
+        taskcnt = 0;
+    current_SP = tasksp[taskcnt];
     restore_context();
 }
 void os_delay_tick(unsigned short tick)
