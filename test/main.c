@@ -9,7 +9,7 @@ void task_blink_p3(void);
 void main()
 {
 	os_create_task(task_blink, 0x18);
-	os_create_task(task_uart, 0x10);
+	os_create_task(task_uart, 0x30);
 	os_create_task(task_blink_p3, 0x18);
 
 	os_start_scheduler();
@@ -19,7 +19,6 @@ void main()
 void task_uart(void)
 {
 	uart_init();
-	// uart_set_mode_it(UART_MODE_IT_TRANS);
 
 	int8_t count = -127;
 
@@ -49,7 +48,6 @@ void task_blink_p3(void)
 	{
 		a++;
 		P2 = a;
-		// P2 = ~P2;
 		os_yeild();
 	}
 }

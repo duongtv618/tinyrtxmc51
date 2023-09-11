@@ -2,6 +2,12 @@
 
 A tiny rtos feature for at89c51
 
+The at89c51 has a internal RAM of 128 bytes from address 0x00 to 0x7f,
+each task takes at least 15 bytes to operate so the minimun stack size should be
+0x20. Because the iram is tiny so i can only perform such simple task like 
+print some preset string through uart, blink port 3 and increase port2 continuous.
+With this set-up there is no more iram.
+
 # Specs
 
 MCU     : AT89C51<br>

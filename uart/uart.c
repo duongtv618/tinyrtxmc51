@@ -19,6 +19,41 @@ void uart_init(void)
     TR1 = 1;
 }
 
+
+/** help function*/
+void print_int8_t(int8_t c)
+{
+	char buf[5];
+	char i;
+	char negative = 0;
+	int8_t temp;
+
+	i = 0;
+	temp = c;
+	buf[i++] = 0;
+
+	if (c < 0)
+	{
+		negative = 1;
+		c = -c;
+	}
+
+	do
+	{
+		temp = c % 10;
+		buf[i++] = temp + '0';
+	} while ((c /= 10) > 0);
+
+	if (negative)
+		buf[i++] = '-';
+
+	// reverse;
+	while (buf[--i])
+	{
+		uart_put_char(buf[i]);
+	}
+}
+
 void uart_put_char(char c)
 {
     SBUF = c;
@@ -47,52 +82,5 @@ void uart_put_string(const char *str)
 
 void uart_ISR(void) __interrupt SI0_VECTOR __naked
 {
-    if (UART_MODE_IT_REC == mode)
-    {
-        RI = 0;
-        uart_rec_it_callback(SBUF);
-    }
-    else
-    {
-        TI = 0;
-        if (cur_buf[0] != 0)
-        {
-            SBUF = cur_buf[0];
-            cur_buf++;
-        }
-        else
-        {
-            trans_complete = 1;
-        }
-    }
-
-    __asm__("reti\n\t");
-}
-
-void uart_set_mode_it(char m)
-{
-    mode = m;
-    UART_INTERRUPT_ENABLE;
-}
-void uart_put_char_it(char c)
-{
-    SBUF = c;
-}
-
-void uart_put_string_it(const char *str)
-{
-    if (NOT_COMPLETE == trans_complete)
-        return;
-
-    if (str[0] == 0)
-        return;
-
-    trans_complete = NOT_COMPLETE;
-    SBUF = str[0];
-    cur_buf = str + 1;
-}
-
-void uart_rec_it(void (*func)(char))
-{
-    uart_rec_it_callback = func;
+    __asm__("reti");
 }

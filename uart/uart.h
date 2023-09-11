@@ -2,6 +2,7 @@
 #define UART_H
 
 #include "8051.h"
+#include "stdint.h"
 
 #define UART_MODE_IT_REC 0
 #define UART_MODE_IT_TRANS 1
@@ -14,11 +15,8 @@ void uart_put_char(char);
 void uart_put_string(const char *);
 char uart_is_rx_ready(void);
 char uart_read_char(void);
+void print_int8_t(int8_t);
 
 void uart_ISR(void) __interrupt SI0_VECTOR __naked;
-void uart_set_mode_it(char);
-void uart_rec_it(void (*func)(char));
-void uart_put_char_it(char c);
-void uart_put_string_it(const char *str);
 
 #endif
