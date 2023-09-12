@@ -8,6 +8,10 @@ each task takes at least 15 bytes to operate so the minimun stack size should be
 print some preset string through uart, blink port 3 and increase port2 continuous.
 With this set-up there is no more iram.
 
+---
+
+After update spinlock, the program iram space for task is reduce so that i cant bring more feature like semaphor or signal to this project. Timer is on development.
+
 # Specs
 
 MCU     : AT89C51<br>
