@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include "8051.h"
 
-#define STACK_START 0x28
+#define STACK_START 0x30
 #define STACK_TOP_STACK 0X7F
 #define MAX_TASK 3
 #define TIMER0_INT_ENABLE (ET0 = 1)
@@ -114,9 +114,13 @@ static void timer0_start(void)
 
 void Timer0_ISR(void) __interrupt TF0_VECTOR __naked
 {
+    /** the reload value is 0xDBFF but the timer value
+     * need 4 machine cycle to reload so actual value is
+     * 0xDC03
+    */
     TF0 = 0;
-    TH0 = 0xdb;
-    TL0 = 0xff;
+    TH0 = 0xdc;
+    TL0 = 0x03;
 
     ++_tick;
     save_context();
