@@ -17,6 +17,7 @@ After update spinlock, the program iram space for task is reduce so that i cant 
 MCU     : AT89C51<br>
 iRAM    : 128 bytes<br>
 Flash   : 4KB<br>
+I use edsim51 for this project
 
 # Compiler
 
